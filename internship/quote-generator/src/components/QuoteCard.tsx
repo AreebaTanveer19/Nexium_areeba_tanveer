@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Share2, RefreshCw } from 'lucide-react';
+import { Copy, Share2, RefreshCw, Link as LinkIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface QuoteCardProps {
@@ -12,6 +12,7 @@ interface QuoteCardProps {
   error?: string;
   onCopy: () => void;
   onShare: () => void;
+  onShareLink: () => void;
   onNewQuote: () => void;
 }
 
@@ -23,49 +24,100 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
   error,
   onCopy,
   onShare,
+  onShareLink,
   onNewQuote,
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="w-full max-w-xl"
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -20 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      className="w-full max-w-2xl"
     >
-      <Card className="backdrop-blur-lg bg-white/60 dark:bg-black/40 border border-white/30 dark:border-black/30 shadow-2xl rounded-3xl overflow-hidden">
-        <CardContent className="p-8 flex flex-col items-center gap-4">
+      <div className="card bg-base-100 shadow-2xl rounded-3xl border border-base-300 overflow-hidden">
+        <div className="card-body p-8 md:p-10 flex flex-col items-center gap-6">
           {loading ? (
-            <div className="w-full h-24 rounded-lg bg-base-300 animate-pulse" />
+            <div className="w-full space-y-4">
+              <div className="h-8 bg-base-300 rounded-lg animate-pulse" />
+              <div className="h-8 bg-base-300 rounded-lg animate-pulse w-3/4" />
+              <div className="h-8 bg-base-300 rounded-lg animate-pulse w-1/2" />
+            </div>
           ) : error ? (
-            <div className="text-error text-center font-semibold">{error}</div>
+            <div className="text-error text-center font-semibold text-lg">{error}</div>
           ) : (
             <>
-              <blockquote className="text-2xl md:text-3xl font-serif font-semibold text-center text-base-content drop-shadow-sm select-text">
-                “{quote}”
-              </blockquote>
-              <div className="mt-4 text-right w-full text-base font-medium text-base-content/80 font-sans">— {author || 'Unknown'}</div>
-              {tag && <div className="badge badge-primary badge-outline mt-2">{tag}</div>}
+              <motion.blockquote 
+                className="text-xl md:text-2xl lg:text-3xl font-serif font-medium text-center text-primary-content leading-relaxed select-text"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              >
+                &ldquo;{quote}&rdquo;
+              </motion.blockquote>
+              <motion.div 
+                className="mt-6 text-right w-full text-base md:text-lg font-medium text-secondary font-sans"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                — {author || 'Unknown'}
+              </motion.div>
+              {tag && (
+                <motion.div 
+                  className="badge badge-primary badge-outline mt-4"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6, duration: 0.3 }}
+                >
+                  {tag}
+                </motion.div>
+              )}
             </>
           )}
-        </CardContent>
-        <CardFooter className="flex justify-between gap-2 p-4">
-          <motion.div whileHover={{ scale: 1.08, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}>
-            <Button onClick={onNewQuote} variant="primary" className="gap-2 transition-transform">
-              <RefreshCw size={18} /> New Quote
-            </Button>
+        </div>
+        <div className="card-actions flex flex-col gap-3 p-6 bg-base-200 border-t border-base-300">
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <button 
+              onClick={onNewQuote} 
+              className="btn btn-primary w-full gap-2"
+              disabled={loading}
+            >
+              <RefreshCw size={18} className={loading ? 'animate-spin' : ''} /> 
+              New Quote
+            </button>
           </motion.div>
-          <motion.div whileHover={{ scale: 1.08, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}>
-            <Button onClick={onCopy} variant="secondary" className="gap-2 transition-transform">
-              <Copy size={18} /> Copy
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.08, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}>
-            <Button onClick={onShare} variant="accent" className="gap-2 transition-transform">
-              <Share2 size={18} /> Share
-            </Button>
-          </motion.div>
-        </CardFooter>
-      </Card>
+          <div className="grid grid-cols-3 gap-2 w-full">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <button 
+                onClick={onCopy} 
+                className="btn btn-outline w-full gap-2"
+                type="button"
+              >
+                <Copy size={16} /> Copy
+              </button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <button 
+                onClick={onShare} 
+                className="btn btn-outline w-full gap-2"
+                type="button"
+              >
+                <Share2 size={16} /> Share
+              </button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <button 
+                onClick={onShareLink} 
+                className="btn btn-outline w-full gap-2"
+                type="button"
+              >
+                <LinkIcon size={16} /> Link
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }; 
