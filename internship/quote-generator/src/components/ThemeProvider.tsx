@@ -21,18 +21,22 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState('pastel');
+  const [currentTheme, setCurrentTheme] = useState('light');
 
   useEffect(() => {
-    // Get saved theme or default to pastel
-    const savedTheme = localStorage.getItem('theme') || 'pastel';
-    console.log('Loading saved theme:', savedTheme);
-    setCurrentTheme(savedTheme);
-    applyTheme(savedTheme);
+    // Get saved theme or default to light
+    const savedTheme = localStorage.getItem('theme');
+    const validThemes = ['light', 'dark'];
+    const themeToApply = validThemes.includes(savedTheme!) ? savedTheme! : 'light';
+    console.log('Loading saved theme:', themeToApply);
+    setCurrentTheme(themeToApply);
+    applyTheme(themeToApply);
   }, []);
 
   const applyTheme = (theme: string) => {
-    console.log('Applying theme:', theme);
+    const validThemes = ['light', 'dark'];
+    const themeToApply = validThemes.includes(theme) ? theme : 'light';
+    console.log('Applying theme:', themeToApply);
     
     // Force a complete theme refresh
     const html = document.documentElement;
@@ -44,7 +48,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     void html.offsetHeight;
     
     // Set new data-theme
-    html.setAttribute('data-theme', theme);
+    html.setAttribute('data-theme', themeToApply);
     
     // Force another reflow to ensure changes are applied
     void html.offsetHeight;
@@ -53,15 +57,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   const changeTheme = (theme: string) => {
-    console.log('Changing theme to:', theme);
-    setCurrentTheme(theme);
+    const validThemes = ['light', 'dark'];
+    const themeToApply = validThemes.includes(theme) ? theme : 'light';
+    console.log('Changing theme to:', themeToApply);
+    setCurrentTheme(themeToApply);
     
     // Apply theme with a small delay to ensure state updates
     setTimeout(() => {
-      applyTheme(theme);
+      applyTheme(themeToApply);
     }, 0);
     
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('theme', themeToApply);
   };
 
   return (

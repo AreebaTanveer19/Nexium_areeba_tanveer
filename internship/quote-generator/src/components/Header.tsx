@@ -5,31 +5,8 @@ import { Palette } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 const themes = [
-  { name: 'pastel', label: 'Pastel' },
-  { name: 'cupcake', label: 'Cupcake' },
-  { name: 'dracula', label: 'Dracula' },
-  { name: 'forest', label: 'Forest' },
-  { name: 'synthwave', label: 'Synthwave' },
-  { name: 'retro', label: 'Retro' },
-  { name: 'cyberpunk', label: 'Cyberpunk' },
-  { name: 'valentine', label: 'Valentine' },
-  { name: 'halloween', label: 'Halloween' },
-  { name: 'garden', label: 'Garden' },
-  { name: 'aqua', label: 'Aqua' },
-  { name: 'lofi', label: 'Lo-Fi' },
-  { name: 'fantasy', label: 'Fantasy' },
-  { name: 'wireframe', label: 'Wireframe' },
-  { name: 'black', label: 'Black' },
-  { name: 'luxury', label: 'Luxury' },
-  { name: 'corporate', label: 'Corporate' },
-  { name: 'cmyk', label: 'CMYK' },
-  { name: 'autumn', label: 'Autumn' },
-  { name: 'business', label: 'Business' },
-  { name: 'acid', label: 'Acid' },
-  { name: 'lemonade', label: 'Lemonade' },
-  { name: 'night', label: 'Night' },
-  { name: 'coffee', label: 'Coffee' },
-  { name: 'winter', label: 'Winter' }
+  { name: 'light', label: 'Light' },
+  { name: 'dark', label: 'Dark' }
 ];
 
 export const Header: React.FC = () => {

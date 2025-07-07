@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Share2, RefreshCw, Link as LinkIcon } from 'lucide-react';
@@ -27,6 +27,19 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
   onShareLink,
   onNewQuote,
 }) => {
+  const [quoteColor, setQuoteColor] = useState('#000');
+
+  useEffect(() => {
+    const updateColor = () => {
+      const theme = document.documentElement.getAttribute('data-theme');
+      setQuoteColor(theme === 'dark' ? '#fff' : '#000');
+    };
+    updateColor();
+    const observer = new MutationObserver(updateColor);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -48,7 +61,8 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({
           ) : (
             <>
               <motion.blockquote 
-                className="text-xl md:text-2xl lg:text-3xl font-serif font-medium text-center text-primary-content leading-relaxed select-text"
+                className={`text-xl md:text-2xl lg:text-3xl font-serif font-medium text-center leading-relaxed select-text transition-colors duration-300`}
+                style={{ color: quoteColor }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
