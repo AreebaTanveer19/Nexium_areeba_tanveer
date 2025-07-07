@@ -19,35 +19,6 @@ export function Toaster() {
           fontWeight: '500',
         },
         className: 'glass backdrop-blur-sm',
-        success: {
-          style: {
-            background: 'hsl(var(--success) / 0.1)',
-            border: '1px solid hsl(var(--success) / 0.3)',
-            color: 'hsl(var(--success))',
-          },
-          iconTheme: {
-            primary: 'hsl(var(--success))',
-            secondary: 'hsl(var(--success) / 0.1)',
-          },
-        },
-        error: {
-          style: {
-            background: 'hsl(var(--destructive) / 0.1)',
-            border: '1px solid hsl(var(--destructive) / 0.3)',
-            color: 'hsl(var(--destructive))',
-          },
-          iconTheme: {
-            primary: 'hsl(var(--destructive))',
-            secondary: 'hsl(var(--destructive) / 0.1)',
-          },
-        },
-        loading: {
-          style: {
-            background: 'hsl(var(--primary) / 0.1)',
-            border: '1px solid hsl(var(--primary) / 0.3)',
-            color: 'hsl(var(--primary))',
-          },
-        },
       }}
     />
   );

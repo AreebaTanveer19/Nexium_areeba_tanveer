@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Star, Trash2, Share2, Copy } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,6 +23,18 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
   favorites,
   onRemoveFavorite,
 }) => {
+  const [quoteColor, setQuoteColor] = useState('#000');
+  useEffect(() => {
+    const updateColor = () => {
+      const theme = document.documentElement.getAttribute('data-theme');
+      setQuoteColor(theme === 'dark' ? '#fff' : '#000');
+    };
+    updateColor();
+    const observer = new MutationObserver(updateColor);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
   const handleCopy = (quote: Quote) => {
     navigator.clipboard.writeText(`"${quote.content}" — ${quote.author}`);
     toast.success("📋 Quote copied to clipboard!", {
@@ -97,7 +109,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                           transition={{ delay: index * 0.05 }}
                           className="bg-base-200 rounded-xl p-4 border border-base-300"
                         >
-                          <blockquote className="text-lg font-serif mb-2 text-primary-content">
+                          <blockquote className="text-lg font-serif mb-2" style={{ color: quoteColor }}>
                             &ldquo;{quote.content}&rdquo;
                           </blockquote>
                           <div className="flex items-center justify-between">
