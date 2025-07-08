@@ -1,5 +1,5 @@
 import React from "react";
-import { TopicQuoteForm } from "../components/TopicQuoteForm";
+import TopicQuoteForm  from "../components/TopicQuoteForm";
 
 export default function Home() {
   return (

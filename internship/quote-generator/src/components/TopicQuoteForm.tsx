@@ -1,88 +1,136 @@
 'use client';
-import React, { useState } from 'react';
-import { Button } from './ui/button';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, ClipboardCopy } from 'lucide-react';
 
 const QUOTES = [
   { topic: 'life', content: 'Life is what happens when you are busy making other plans.', author: 'John Lennon' },
-  { topic: 'life', content: 'The purpose of our lives is to be happy.', author: 'Dalai Lama' },
-  { topic: 'life', content: 'Get busy living or get busy dying.', author: 'Stephen King' },
   { topic: 'success', content: 'Success is not the key to happiness. Happiness is the key to success.', author: 'Albert Schweitzer' },
-  { topic: 'success', content: 'Success usually comes to those who are too busy to be looking for it.', author: 'Henry David Thoreau' },
-  { topic: 'success', content: 'Dont be afraid to give up the good to go for the great.', author: 'John D. Rockefeller' },
-  { topic: 'love', content: 'Love all, trust a few, do wrong to none.', author: 'William Shakespeare' },
   { topic: 'love', content: 'We accept the love we think we deserve.', author: 'Stephen Chbosky' },
-  { topic: 'love', content: 'To love and be loved is to feel the sun from both sides.', author: 'David Viscott' },
-  { topic: 'motivation', content: 'The only way to do great work is to love what you do.', author: 'Steve Jobs' },
-  { topic: 'motivation', content: 'The harder you work for something, the greater you\'ll feel when you achieve it.', author: 'Unknown' },
   { topic: 'motivation', content: 'Push yourself, because no one else is going to do it for you.', author: 'Unknown' },
   { topic: 'friendship', content: 'Friendship is the only cement that will ever hold the world together.', author: 'Woodrow Wilson' },
-  { topic: 'friendship', content: 'A real friend is one who walks in when the rest of the world walks out.', author: 'Walter Winchell' },
-  { topic: 'friendship', content: 'Friendship doubles your joys and divides your sorrows.', author: 'Euripides' },
   { topic: 'wisdom', content: 'Knowing yourself is the beginning of all wisdom.', author: 'Aristotle' },
-  { topic: 'wisdom', content: 'Turn your wounds into wisdom.', author: 'Oprah Winfrey' },
-  { topic: 'wisdom', content: 'The only true wisdom is in knowing you know nothing.', author: 'Socrates' },
   { topic: 'creativity', content: 'Creativity is intelligence having fun.', author: 'Albert Einstein' },
-  { topic: 'creativity', content: 'You can not use up creativity. The more you use, the more you have.', author: 'Maya Angelou' },
-  { topic: 'creativity', content: 'Creativity takes courage.', author: 'Henri Matisse' },
-  { topic: 'perseverance', content: 'Perseverance is not a long race; it is many short races one after the other.', author: 'Walter Elliot' },
-  { topic: 'perseverance', content: 'It does not matter how slowly you go as long as you do not stop.', author: 'Confucius' },
   { topic: 'perseverance', content: 'Through perseverance many people win success out of what seemed destined to be certain failure.', author: 'Benjamin Disraeli' },
-  { topic: 'sad', content: 'Tears come from the heart and not from the brain.', author: 'Leonardo da Vinci' },
-  { topic: 'sad', content: 'Every human walks around with a certain kind of sadness. They may not wear it on their sleeves, but it\'s there if you look deep.', author: 'Taraji P. Henson' },
-  { topic: 'sad', content: 'The word "happy" would lose its meaning if it were not balanced by sadness.', author: 'Carl Jung' }
+  { topic: 'kindness', content: 'Kindness is a language which the deaf can hear and the blind can see.', author: 'Mark Twain' },
+  { topic: 'peace', content: 'Peace begins with a smile.', author: 'Mother Teresa' },
+  { topic: 'happiness', content: 'Happiness is not something ready made. It comes from your own actions.', author: 'Dalai Lama' },
+  { topic: 'growth', content: 'The only way to grow is to challenge yourself.', author: 'Ashley Tisdale' },
+  { topic: 'courage', content: 'It takes courage to grow up and become who you really are.', author: 'E.E. Cummings' }
 ];
 
-export const TopicQuoteForm: React.FC = () => {
+export default function QuoteGenerator() {
   const [topic, setTopic] = useState('');
-  const [results, setResults] = useState<{ content: string; author: string }[]>([]);
-  const [submitted, setSubmitted] = useState(false);
+  const [typedQuote, setTypedQuote] = useState('');
+  const [currentQuote, setCurrentQuote] = useState<{ content: string; author: string } | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [copied, setCopied] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const filtered = QUOTES.filter(q => q.topic.toLowerCase() === topic.trim().toLowerCase()).slice(0, 3);
-    setResults(filtered);
-    setSubmitted(true);
+  const topics = [...new Set(QUOTES.map(q => q.topic))];
+
+  useEffect(() => {
+    const lastTopic = localStorage.getItem('last_topic');
+    if (lastTopic) {
+      setTopic(lastTopic);
+    }
+  }, []);
+
+  const handleTyping = (text: string) => {
+    if (!text || text.length === 0) {
+      setTypedQuote('');
+      return;
+    }
+    setTypedQuote(text);
+  };
+
+  const handleSearch = () => {
+    const filtered = QUOTES.filter(q => q.topic === topic.trim().toLowerCase());
+    if (filtered.length === 0) {
+      setCurrentQuote({ content: 'No quote found for this topic.', author: '' });
+      setTypedQuote('');
+      handleTyping('No quote found for this topic.');
+      return;
+    }
+    const picked = filtered[Math.floor(Math.random() * filtered.length)];
+    setCurrentQuote(picked);
+    handleTyping(picked.content);
+    localStorage.setItem('last_topic', topic);
+  };
+
+  const handleRandom = () => {
+    const picked = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    setCurrentQuote(picked);
+    handleTyping(picked.content);
+  };
+
+  const handleCopy = () => {
+    if (typedQuote) {
+      navigator.clipboard.writeText(typedQuote);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
+
+  const handleInputChange = (value: string) => {
+    setTopic(value);
+    const filtered = topics.filter(t => t.startsWith(value.toLowerCase()));
+    setSuggestions(filtered.slice(0, 5));
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-neutral-900">
-      <div className="w-full max-w-md border border-neutral-300 dark:border-neutral-700 rounded-2xl p-8 bg-neutral-100 dark:bg-neutral-800 shadow-2xl">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-4 font-sans text-neutral-900 dark:text-neutral-100 tracking-tight">
-          Quote Generator
-        </h1>
-        <p className="text-center text-neutral-500 dark:text-neutral-400 mb-8 text-base font-normal">
-          Enter a topic to find relevant quotes.
-        </p>
-        <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
-          <label htmlFor="topic" className="font-medium text-neutral-700 dark:text-neutral-200 text-base">Topic (e.g., life, success, love):</label>
-          <input
-            id="topic"
-            type="text"
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-tr from-pink-100 via-purple-100 to-indigo-200 dark:from-gray-900 dark:via-gray-800 dark:to-black transition-colors">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-md p-6 md:p-10 bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl backdrop-blur-md border border-white/30"
+      >
+        <div className="flex flex-col items-center gap-3">
+          <Sparkles className="w-8 h-8 text-indigo-500 dark:text-indigo-300 animate-bounce" />
+          <h1 className="text-3xl font-bold text-center text-neutral-800 dark:text-white">Quote Generator</h1>
+          <p className="text-center text-neutral-600 dark:text-neutral-300 text-sm">Choose a topic or try random</p>
+
+          <select
             value={topic}
-            onChange={e => setTopic(e.target.value)}
-            className="input input-bordered w-full text-base px-4 py-2 rounded-md focus:ring-2 focus:ring-neutral-400 focus:outline-none bg-transparent border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100"
-            placeholder="Type a topic..."
-            required
-          />
-          <Button type="submit" className="btn btn-primary w-full text-base py-2 rounded-md shadow-sm mt-2">Show Quotes</Button>
-        </form>
-        {submitted && (
-          <div className="mt-8 w-full">
-            {results.length > 0 ? (
-              <ul className="space-y-5">
-                {results.map((q, i) => (
-                  <li key={i} className="p-5 bg-transparent rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm">
-                    <blockquote className="text-lg md:text-xl font-serif mb-2 text-neutral-800 dark:text-neutral-100 text-center leading-snug">&ldquo;{q.content}&rdquo;</blockquote>
-                    <div className="text-right text-sm text-neutral-500 dark:text-neutral-400 font-medium">— {q.author}</div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="text-error mt-4 text-center text-base font-semibold">No quotes found for this topic.</div>
-            )}
+            onChange={(e) => handleInputChange(e.target.value)}
+            className="w-full px-4 py-2 rounded-md mt-3 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-700 text-black dark:text-white focus:ring-2 ring-indigo-400"
+          >
+            <option value="">Select a topic...</option>
+            {topics.map((t, idx) => <option key={idx} value={t}>{t}</option>)}
+          </select>
+
+          <div className="flex gap-2 w-full mt-4">
+            <button onClick={handleSearch} className="w-full py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition">Find Quote</button>
+            <button onClick={handleRandom} className="w-full py-2 rounded-md bg-pink-500 text-white hover:bg-pink-600 transition">Random</button>
           </div>
-        )}
-      </div>
+
+          <AnimatePresence>
+            {typedQuote && (
+              <motion.div
+                key={typedQuote}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 30 }}
+                transition={{ delay: 0.2 }}
+                className="mt-8 text-center relative"
+              >
+                <blockquote className="text-xl font-medium text-neutral-800 dark:text-white leading-snug">
+                  “{typedQuote}”
+                </blockquote>
+                {currentQuote?.author && (
+                  <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-300">— {currentQuote.author}</p>
+                )}
+                <button onClick={handleCopy} className="absolute top-0 right-0 text-indigo-500 dark:text-indigo-300 hover:text-indigo-700">
+                  <ClipboardCopy size={20} />
+                </button>
+                {copied && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded text-xs mt-2 shadow">Copied!</span>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </div>
   );
-};
+}
