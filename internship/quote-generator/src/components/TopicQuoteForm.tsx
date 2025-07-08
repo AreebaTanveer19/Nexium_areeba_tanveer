@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ClipboardCopy } from 'lucide-react';
 
@@ -23,7 +23,6 @@ export default function QuoteGenerator() {
   const [topic, setTopic] = useState('');
   const [typedQuote, setTypedQuote] = useState('');
   const [currentQuote, setCurrentQuote] = useState<{ content: string; author: string } | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
 
   const topics = [...new Set(QUOTES.map(q => q.topic))];
@@ -73,8 +72,6 @@ export default function QuoteGenerator() {
 
   const handleInputChange = (value: string) => {
     setTopic(value);
-    const filtered = topics.filter(t => t.startsWith(value.toLowerCase()));
-    setSuggestions(filtered.slice(0, 5));
   };
 
   return (
